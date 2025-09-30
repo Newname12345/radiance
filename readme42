@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# Script to run miner on GPUs 0-7 with miner-bridge
+# Each GPU gets a different nonce offset to avoid overlap
+
+echo "🌊 Neptune CUDA Miner - Starting on GPUs 0-7"
+echo "👤 Worker ID: 558"
+echo "🎮 GPU Model: RTX 6000 ADA"
+echo "⚙️  Miner Binary: miner_42g"
+echo "🔗 Wallet Address: nolgam150m8xx2psvka2...z80k6lmfcd"
+
+# Check if miner and bridge exist
+if [ ! -f "./miner_42g" ]; then
+    echo "❌ Error: ./miner_42g not found. Please compile first."
+    exit 1
+fi
+
+if [ ! -f "./miner-bridge" ]; then
+    echo "❌ Error: ./miner-bridge not found. Please compile first."
+    exit 1
+fi
+
+# Function to cleanup on exit
+cleanup() {
+    echo ""
+    echo "🛑 Stopping all miners and bridge..."
+    pkill -f "./miner_42g --gpu" 2>/dev/null
+    pkill -f "./miner-bridge" 2>/dev/null
+    wait
+    echo "✅ All miners and bridge stopped"
+    exit 0
+}
+
+# Set up signal handling
+trap cleanup SIGINT SIGTERM
+
+# Start miner-bridge first
+echo "🔗 Starting miner-bridge..."
+./miner-bridge --guesser-address nolgam150m8xx2psvka2pdyhyx4zcr6hq8q3kxu934hfpjhuvzrztaq4m5y4ftc86vvfa89wzfs3s58tw28dd2r7v80gh9pfjgpqvp3s9geuv7vmevee8m2rt9lj9gvqytdhz7gr3f0ex8wkpvsd6n2frdyarndlpnl03reyu2dnj4efa6r57f5z5mejmtw0xxzhq9axfv5l0yha9jn58426se904xkmjvgtgyxr0r8egc0zc0mqnagj40d2p2xc83kjrlcm6gc077kapnej5p82gfw9pj3jwrhvlrghcwfpfulwwdr5skh2jvx8x9csc4xmyxxu6v09ccxqrcfn39wt4fynd66p5q9xnfjtqsu83k837l9cyntvk9gz6rqyjgcjwdv2nfqd98x9atptgfr55ax2l9zv5ueygyhcp0wk0pd2v92tgzhfvwwjlmrreduyrw8zu9l66u64j3664hyvrxvx2c42ul6c3hc2fpl640yuktrmdq9gttma555lccuz8mt7cndruxlqfctauszgvtaynvqhqv4y2tnrw5pw9jtwpj6jxk65mnhtwt8p3c8v0n3aaqmzsvz23hcgsg9gfwmsm66dhf9v7q2h7hgyhugfx5l5ney8kwlkwd0tv3cn4u03sv7j76a56fyfg3ux7fuxt96pxelgtwsh3c2fygz8ze0dny9cq9l4s5d0x5t4pr2rqmdwdp7vqg8hydn7mhvx65syqsx2fxza33356l6x35tu4ulmmzuyj3hledqde9jv0w53q0slpj6ur8e8h4rdw0w0gtynf8wpq6ksl78hxd6suhv35uat2srq8x0hn5h0ujza7j0h4qwaaz9jfx6jn47n3tcs359lcwhk8svtpt0e0j52hkezy554tqsz926r83mnp68tyrax5h3teustpzwz9e36vp5gu6qrm37702vqmg0hsl0wywzy3j3cn7yu4a4f9uheqrh2zrlw4kcaewuuy3kkxedppfwwptpt3s46jhd8l9e5g9mp54lakmrq9whdughluuqsyf348xr5u937phf4utx5lx2ttyld5kya2uh9g5s4lg28n9w7gzdv2hvr7tgt88ctz7jl79p4vyazj7gd4wwsjssnj758s5e37fjdessve27mhy07ptz8nfx26qtc9krfgg5raakdhsq3r7zg2ldv6xt7prx0t773d4dfhs8v0pr0kafzxh4avzl4zv9j5d6klul227x6s4vvjdxy4f8xtctg0yfueh07y9pj6j7zje40jwy906tltgt9pldpg635jx8atxahg007mwvq9jld0r0eu7cgjy6djx02rh08n2hyez43t2hs2hpukkezprjx8f9xavcm8cld6jcye89kd3c5r3ll45zshjvcczz3ltfvsxvsxhrhuuyvpku6h0t5t9hdshdlp3nu09lxeza3xr96tdqr6rs5ulu3pegvmucgfle47fm7l893aukhjlfhl8p9q2dftxt8hzcr30r78e59tjy98wmkqaxw8xy62jvx2fchetf373dfczmk3vcuz9xtj6kwmdk88egfq2k24fk4y2rx58sl9zs88j2mjym34gpaawxy8z28u0ef2h4f97r8jna95qqcaclfhvn49vxqd6xa7kmsct2lxmm93acudh87rslf2zcdu7p55q6v5wsk23q6ekarsy6zlwzrf2znyn667aet7ne2rcymjduty385jq2lj30w3xq6efgyc3dukgg6quzjrux4e4mnq6s50nhj3j4666wh3tuhr8jm8wknvgfppjz8jjkjhj5qmy0xrwxycf7cwjljrt35ra5afknh3zrm0jdwuk3xw9sldw0davfm7kwaaktx883lr67xpd78rmm3l7qrqf8du5u4r898l0sfdnjcakx2s52pgcanzj00mqyrwgvsvhw0n2r9frvg090ed3ak82myxsnekyzeprxmf0uv5gku0gfkp3swg9f88397d37s9k0qjrzm37j95sxgn7nazjl933a9zj4vsxez0qt3jrw5qvlc8nzprryz84szpynmz9skwzqe9lde0hqua0v9jyn5c0mkwyvpl45vj43ylxtfp63h7cg0hr2sxnmyhlspd07xt57mczv6fhyv0p5mg20l9wa8scv77krl2tyl0sj5xmdx68h988g3ypu2fpgeh4l3s207au8u8qs0cr3a48t86hfumex48x7rfkgcdre2pkf66k545h7zw2u6p2pqjnpf2z5yjq7r3z4nf6nr7lf5vf9rmp968ncnfk92q0fmj6kt240cdrhzn4qd30wsr0prs0sv7hew7hatq4gve4kslvl6hh0m5zf6qydsdp3nahtz05mz9r533mdnd9tdtct89u0rsse5je77qm4qy3yxdjudehham9hw7wyjdlr6uzwkvxaslcxqlj7vh4aekm8wu7g30e28ypwzs64zp4l4flhdt24gqgfqyru77pmuhzsr6759hyv7kkfrmzy936203n5dywek28fhp0t3kaf7slwdrnjj6afw89fjvzg3tl7dlkcr7wlkz0anl3lkzy2ltgweedzuw9a8qqcr6gms9dqckw9htzxydmdggnad0htlqel6q0q8r22ysqpqxr5uh6z0dg98hyjesufmts7tflndsxmw0lq98dt8634f90exqf9fqe2f07atftlh0t9jvk38qlsd9ws38n62587v9psfelfec2x44fv2zu90x4mddlvj229vjn5zeugnlzdw4dfpu2gjq2kmjajjadgst9n6a596czfh8x6eqpj6wcjm63hl5tqqzwt7d07nqvh66mg7cknccmjj84mzpfgsnqch0zjvf9x5uzvnwhahqdl7tgtmgn2a0lys6mqghytuaujqpvqxpjlns2528r280yrz47gcp2r9s8pwwx8xmrgeyhs8g5q78y6xjflqfps7p5la335dnag6tkr7mwxhhqzk70rc6tf7zsefyngnmgqdsldejz3tg65vr8yacyy2lwe64njeqsxangvultkdkye2w2kywy40em3ycgm62j5l9vkpwq9w2sspjf6lnfuwgu9ne2455su44tn6w6uyzrdgetwgmhlm0r2utkxpulrq98d35dl9gtv85fqjx4umms0dee66j4wh58a7etz8l6catvhqx22f95p5vxzlyfdumg68qazh9vdyakkl8n8wqr6vlhqdj2rhrf8kwzturpy6850wxg42928rucj56wljkqqndmuth442e8yxu4cj3na56fjhagxkwxzttuu3sc2azyyjjcygaf4x486vyqryzkrcg2527u8qsws5nxc6pxkt8rsglfnpu0xz0dk4csm4egnhnhs3utlwjtme6cnyt9e75p9eyzsastj7962h0g6avern4mv5syqns2qaz68mfr6j54ncwwngfk4tknnlt40980yfz6pwkp3rz80k6lmfcd &
+sleep 2  # Give bridge time to start
+
+# Start miners on available GPUs
+for gpu_id in {0..7}; do
+    # Check if GPU exists
+    if nvidia-smi -i $gpu_id &>/dev/null; then
+        nonce_offset=$((1674000 + gpu_id * 150))
+        echo "🚀 Starting miner on GPU $gpu_id with nonce offset $nonce_offset"
+        
+        # Start miner (no wallet address needed - handled by bridge)
+        ./miner_42g --gpu $gpu_id --nonce-offset $nonce_offset &
+        
+        sleep 1  # Small delay between starts
+    else
+        echo "⚠️  GPU $gpu_id not available, skipping"
+    fi
+done
+
+echo ""
+echo "✅ All available miners and bridge started"
+echo "💡 Each GPU uses a different nonce offset:"
+echo "   GPU 0: nonce offset $((1674000 + 0 * 150))"
+echo "   GPU 1: nonce offset $((1674000 + 1 * 150))"
+echo "   GPU 2: nonce offset $((1674000 + 2 * 150))"
+echo "   GPU 3: nonce offset $((1674000 + 3 * 150))"
+echo "   GPU 4: nonce offset $((1674000 + 4 * 150))"
+echo "   GPU 5: nonce offset $((1674000 + 5 * 150))"
+echo "   GPU 6: nonce offset $((1674000 + 6 * 150))"
+echo "   GPU 7: nonce offset $((1674000 + 7 * 150))"
+echo "🔗 Miner-bridge handling wallet: nolgam150m8xx2psvka2...z80k6lmfcd"
+echo ""
+echo "Press Ctrl+C to stop all miners and bridge"
+
+# Wait for all background processes
+wait
